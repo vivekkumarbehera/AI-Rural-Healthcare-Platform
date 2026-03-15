@@ -1,0 +1,21 @@
+{
+  "name": "ai-rural-health-care",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^9.4.3",
+    "leaflet": "^1.9.4",
+    "next": "14.2.3",
+    "next-auth": "^4.24.7",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-leaflet": "^5.0.0"
+  }
+}
