@@ -4,6 +4,8 @@ import { NextResponse } from 'next/server';
 const apiKey = process.env.GEMINI_API_KEY || '';
 const genAI = new GoogleGenerativeAI(apiKey);
 
+console.log('Chat API route initialized. API Key presence:', !!apiKey);
+
 export async function POST(req) {
   try {
     if (!apiKey) {
@@ -24,25 +26,29 @@ HOWEVER, you are NOT a doctor and must NEVER give a definitive diagnosis.
 Always include a strong disclaimer that they should seek professional medical help if the condition is serious or persists.
 Keep your responses compassionate, easy to understand (simple language), and structured.`;
 
-    const chat = model.startChat({
-      history: messages.map(msg => ({
-        role: msg.role === 'user' ? 'user' : 'model',
-        parts: [{ text: msg.content }],
-      })),
-    });
+    // History should NOT include the latest user message
+    const history = messages.slice(0, -1).map(msg => ({
+      role: msg.role === 'user' ? 'user' : 'model',
+      parts: [{ text: msg.content }],
+    }));
 
-    // Add the system prompt context to the latest message if it's the first one
-    let latestMessage = messages[messages.length - 1].content;
-    if (messages.length === 1) {
-      latestMessage = `${systemPrompt}\n\nUser query: ${latestMessage}`;
-    }
+    const chat = model.startChat({ history });
 
-    const result = await chat.sendMessage(latestMessage);
+    const latestMessage = messages[messages.length - 1].content;
+    const promptToSend = messages.length === 1 
+      ? `${systemPrompt}\n\nUser query: ${latestMessage}`
+      : latestMessage;
+
+    console.log('Sending message to Gemini...');
+    const result = await chat.sendMessage(promptToSend);
     const responseText = result.response.text();
 
     return NextResponse.json({ reply: responseText });
   } catch (error) {
-    console.error('Gemini API Error:', error);
-    return NextResponse.json({ error: 'Failed to process chat request' }, { status: 500 });
+    console.error('Gemini API Error details:', error);
+    return NextResponse.json({ 
+      error: error.message || 'Failed to process chat request',
+      details: error.toString()
+    }, { status: 500 });
   }
 }
