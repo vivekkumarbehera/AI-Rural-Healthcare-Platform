@@ -1,11 +1,11 @@
 'use client';
 // app/auth/signin/page.js — Email Sign In + Create Account
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function SignInPage() {
+function SignInContent() {
   const router = useRouter();
   const params = useSearchParams();
   const [tab, setTab] = useState('signin');
@@ -153,3 +153,17 @@ export default function SignInPage() {
     </div>
   );
 }
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0f18' }}>
+        <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid rgba(0,212,184,0.1)', borderTopColor: '#00d4b8', animation: 'spin 1s linear infinite' }}></div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    }>
+      <SignInContent />
+    </Suspense>
+  );
+}
+

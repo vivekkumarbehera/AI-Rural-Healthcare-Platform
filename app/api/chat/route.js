@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 const apiKey = process.env.GEMINI_API_KEY || '';
 const genAI = new GoogleGenerativeAI(apiKey);
 
-console.log('Chat API route initialized. API Key presence:', !!apiKey);
+console.log('Chat API route initialized. API Key presence:', !!apiKey, 'Length:', apiKey.length, 'Prefix:', apiKey.substring(0, 5));
 
 export async function POST(req) {
   try {
@@ -18,7 +18,7 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Invalid messages format' }, { status: 400 });
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
     const systemPrompt = `You are a helpful AI Health Assistant for rural areas.
 Your goal is to provide general health information and guidance based on users' symptoms.
