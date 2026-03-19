@@ -1,8 +1,1 @@
-{
-  "/page": "app/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/dashboard/chat/page": "app/dashboard/chat/page.js",
-  "/api/chat/route": "app/api/chat/route.js",
-  "/dashboard/hospitals/page": "app/dashboard/hospitals/page.js",
-  "/auth/signin/page": "app/auth/signin/page.js"
-}
+{}

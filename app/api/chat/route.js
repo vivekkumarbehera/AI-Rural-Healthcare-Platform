@@ -18,7 +18,30 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Invalid messages format' }, { status: 400 });
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    // Use a Gemini model that is available for v1beta / supported by current @google/generative-ai version.
+    // gemini-pro is not available in v1beta for generateContent in many environments.
+    let modelName = process.env.GEMINI_MODEL || 'gemini-1.0';
+
+    // If the configured model is not available, auto-select first available generative model.
+    async function getSupportedModel() {
+      try {
+        console.log('Attempting model:', modelName);
+        return genAI.getGenerativeModel({ model: modelName });
+      } catch (err) {
+        console.warn(`Model ${modelName} unavailable, selecting a fallback model. Error:`, err.message || err);
+      }
+
+      const available = await genAI.listModels();
+      const fallback = available.models?.find(m => m.name.startsWith('gemini'))?.name;
+      if (fallback) {
+        console.log('Falling back to model:', fallback);
+        modelName = fallback;
+        return genAI.getGenerativeModel({ model: modelName });
+      }
+      throw new Error('No supported Gemini model found. Call listModels to inspect available options.');
+    }
+
+    const model = await getSupportedModel();
 
     const systemPrompt = `You are a helpful AI Health Assistant for rural areas.
 Your goal is to provide general health information and guidance based on users' symptoms.
